@@ -1,7 +1,7 @@
 {
-  "name": "youtube-captions-server",
+  "name": "yt-transcriptgrabber",
   "version": "1.0.0",
-  "description": "Local server for YouTube captions extraction",
+  "description": "YouTube Transcript Grabber - Extract captions from YouTube videos",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
