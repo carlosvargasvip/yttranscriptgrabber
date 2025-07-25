@@ -1,12 +1,7 @@
 services:
   yt-transcriptgrabber:
-    build: 
-      context: .
-      tags:
-        - "yt-transcriptgrabber:1"
-        - "yt-transcriptgrabber:latest"
+    image: ghcr.io/your-username/yt-transcriptgrabber:latest  # Replace your-username
     container_name: YT-TranscriptGrabber
-    image: yt-transcriptgrabber:1
     ports:
       - "3000:3000"
     environment:
@@ -14,8 +9,20 @@ services:
       - PORT=3000
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "node", "healthcheck.js"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:${PORT:-3000}/health"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 10s
+
+# For development - builds locally
+  yt-transcriptgrabber-dev:
+    build: .
+    container_name: YT-TranscriptGrabber-Dev
+    ports:
+      - "3001:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+    profiles:
+      - dev
