@@ -83,8 +83,23 @@ try:
     video_id = sys.argv[1]
     lang = sys.argv[2] if len(sys.argv) > 2 else 'en'
     
-    transcript = YouTubeTranscriptApi.get_transcript(video_id, languages=[lang])
-    print(json.dumps(transcript))
+    # Create an instance of YouTubeTranscriptApi
+    ytt_api = YouTubeTranscriptApi()
+    
+    # Get the transcript list for the video
+    transcript_list = ytt_api.list(video_id)
+    
+    # Find transcript in the requested language, fallback to any available
+    try:
+        transcript = transcript_list.find_transcript([lang])
+    except:
+        # If requested language not found, get the first available transcript
+        transcript = next(iter(transcript_list))
+    
+    # Fetch the actual transcript data
+    transcript_data = transcript.fetch()
+    print(json.dumps(transcript_data))
+    
 except Exception as e:
     print(json.dumps({"error": str(e)}), file=sys.stderr)
     sys.exit(1)
