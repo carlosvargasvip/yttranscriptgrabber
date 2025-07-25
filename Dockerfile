@@ -20,6 +20,9 @@ RUN npm install --only=production
 # Copy application code
 COPY . .
 
+# Make healthcheck script executable
+RUN chmod +x healthcheck.js
+
 # Create non-root user for security
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nodejs -u 1001
@@ -33,7 +36,7 @@ EXPOSE 3000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:${PORT:-3000}/health || exit 1
+  CMD /app/healthcheck.js
 
 # Start the application
 CMD ["npm", "start"]
