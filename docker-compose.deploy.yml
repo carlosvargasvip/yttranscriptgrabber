@@ -1,0 +1,19 @@
+services:
+  yt-transcriptgrabber:
+    image: ghcr.io/carlosvargasvip/yttranscriptgrabber/yt-transcriptgrabber:latest
+    container_name: YT-TranscriptGrabber
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    labels:
+      - "com.docker.compose.project=yt-transcriptgrabber"
+      - "description=YouTube Transcript Grabber Service"
