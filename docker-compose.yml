@@ -1,7 +1,12 @@
-# docker-compose.yml
 services:
-  youtube-captions:
-    build: .
+  yt-transcriptgrabber:
+    build: 
+      context: .
+      tags:
+        - "yt-transcriptgrabber:1"
+        - "yt-transcriptgrabber:latest"
+    container_name: YT-TranscriptGrabber
+    image: yt-transcriptgrabber:1
     ports:
       - "3000:3000"
     environment:
@@ -9,7 +14,7 @@ services:
       - PORT=3000
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "node", "healthcheck.js"]
+      test: ["CMD", "/app/venv/bin/python", "/app/healthcheck.js"]
       interval: 30s
       timeout: 10s
       retries: 3
