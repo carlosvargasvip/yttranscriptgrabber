@@ -1,4 +1,3 @@
-# Updated server.js (with better logging and error handling)
 const express = require('express');
 const cors = require('cors');
 const { getSubtitles } = require('youtube-captions-scraper');
