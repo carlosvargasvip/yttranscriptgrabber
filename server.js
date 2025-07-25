@@ -90,7 +90,7 @@ except Exception as e:
     sys.exit(1)
 `;
 
-        const python = spawn('python3', ['-c', pythonScript, videoId, lang]);
+        const python = spawn('/app/venv/bin/python', ['-c', pythonScript, videoId, lang]);
         let output = '';
         let errorOutput = '';
 
