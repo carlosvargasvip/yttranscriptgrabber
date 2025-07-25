@@ -1,4 +1,3 @@
-# Dockerfile
 FROM node:18-alpine
 
 # Set working directory
@@ -30,16 +29,3 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 
 # Start the application
 CMD ["npm", "start"]
-
-# .dockerignore
-node_modules
-npm-debug.log
-Dockerfile
-.dockerignore
-.git
-.gitignore
-README.md
-.env
-.nyc_output
-coverage
-.vscode
