@@ -1,13 +1,14 @@
 FROM node:18-alpine
 
 # Install Python and pip for youtube-transcript-api
-RUN apk add --no-cache python3 py3-pip
+RUN apk add --no-cache python3 py3-pip py3-venv
 
 # Set working directory
 WORKDIR /app
 
-# Install Python dependencies
-RUN pip3 install youtube-transcript-api
+# Create and activate virtual environment for Python dependencies
+RUN python3 -m venv /app/venv
+RUN /app/venv/bin/pip install youtube-transcript-api
 
 # Copy package files
 COPY package*.json ./
