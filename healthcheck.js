@@ -1,29 +1,11 @@
-# healthcheck.js
-const http = require('http');
+#!/bin/sh
 
-const options = {
-  hostname: 'localhost',
-  port: 3000,
-  path: '/health',
-  method: 'GET',
-  timeout: 2000
-};
+# Get the port from environment variable, default to 3000
+PORT=${PORT:-3000}
 
-const req = http.request(options, (res) => {
-  if (res.statusCode === 200) {
-    process.exit(0);
-  } else {
-    process.exit(1);
-  }
-});
-
-req.on('error', () => {
-  process.exit(1);
-});
-
-req.on('timeout', () => {
-  req.destroy();
-  process.exit(1);
-});
-
-req.end();
+# Try to connect to the health endpoint
+if wget --no-verbose --tries=1 --spider "http://localhost:${PORT}/health" 2>/dev/null; then
+    exit 0
+else
+    exit 1
+fi
