@@ -34,9 +34,9 @@ USER nodejs
 # Expose port
 EXPOSE 3000
 
-# Health check - using a simpler approach
+# Health check - using IPv4 explicitly
 HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
-  CMD curl -f http://localhost:${PORT:-3000}/health || exit 1
+  CMD curl -4 -f http://127.0.0.1:${PORT:-3000}/health || exit 1
 
 # Start the application
 CMD ["npm", "start"]
