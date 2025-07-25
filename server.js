@@ -96,9 +96,16 @@ try:
         # If requested language not found, get the first available transcript
         transcript = next(iter(transcript_list))
     
-    # Fetch the actual transcript data
+    # Fetch the actual transcript data - this returns a list of dicts
     transcript_data = transcript.fetch()
-    print(json.dumps(transcript_data))
+    
+    # Convert to list if it's not already (should be a list of dicts with 'text', 'start', 'duration')
+    if hasattr(transcript_data, '__iter__') and not isinstance(transcript_data, str):
+        result = list(transcript_data)
+    else:
+        result = transcript_data
+    
+    print(json.dumps(result))
     
 except Exception as e:
     print(json.dumps({"error": str(e)}), file=sys.stderr)
