@@ -96,14 +96,26 @@ try:
         # If requested language not found, get the first available transcript
         transcript = next(iter(transcript_list))
     
-    # Fetch the actual transcript data - this returns a list of dicts
+    # Fetch the actual transcript data
     transcript_data = transcript.fetch()
     
-    # Convert to list if it's not already (should be a list of dicts with 'text', 'start', 'duration')
-    if hasattr(transcript_data, '__iter__') and not isinstance(transcript_data, str):
-        result = list(transcript_data)
-    else:
-        result = transcript_data
+    # Convert FetchedTranscriptSnippet objects to dictionaries
+    result = []
+    for snippet in transcript_data:
+        if hasattr(snippet, 'text') and hasattr(snippet, 'start'):
+            # Convert to dictionary format
+            item = {
+                'text': snippet.text,
+                'start': snippet.start,
+                'duration': getattr(snippet, 'duration', getattr(snippet, 'dur', 0))
+            }
+            result.append(item)
+        elif isinstance(snippet, dict):
+            # Already a dictionary
+            result.append(snippet)
+        else:
+            # Fallback - convert to string
+            result.append({'text': str(snippet), 'start': 0, 'duration': 0})
     
     print(json.dumps(result))
     
