@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { getSubtitles } = require('youtube-captions-scraper');
+const { spawn } = require('child_process');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -45,10 +45,7 @@ app.get('/captions', async (req, res) => {
     }
 
     try {
-        const captions = await getSubtitles({
-            videoID: videoId,
-            lang: lang
-        });
+        const captions = await getYouTubeTranscript(videoId, lang);
 
         console.log(`Successfully fetched ${captions.length} captions for video ${videoId}`);
 
@@ -74,7 +71,56 @@ app.get('/captions', async (req, res) => {
     }
 });
 
-// Your original XML conversion function
+// Function to get YouTube transcript using Python youtube-transcript-api
+function getYouTubeTranscript(videoId, lang = 'en') {
+    return new Promise((resolve, reject) => {
+        const pythonScript = `
+import sys
+import json
+from youtube_transcript_api import YouTubeTranscriptApi
+
+try:
+    video_id = sys.argv[1]
+    lang = sys.argv[2] if len(sys.argv) > 2 else 'en'
+    
+    transcript = YouTubeTranscriptApi.get_transcript(video_id, languages=[lang])
+    print(json.dumps(transcript))
+except Exception as e:
+    print(json.dumps({"error": str(e)}), file=sys.stderr)
+    sys.exit(1)
+`;
+
+        const python = spawn('python3', ['-c', pythonScript, videoId, lang]);
+        let output = '';
+        let errorOutput = '';
+
+        python.stdout.on('data', (data) => {
+            output += data.toString();
+        });
+
+        python.stderr.on('data', (data) => {
+            errorOutput += data.toString();
+        });
+
+        python.on('close', (code) => {
+            if (code === 0) {
+                try {
+                    const result = JSON.parse(output);
+                    resolve(result);
+                } catch (e) {
+                    reject(new Error('Failed to parse transcript data'));
+                }
+            } else {
+                try {
+                    const error = JSON.parse(errorOutput);
+                    reject(new Error(error.error || 'Failed to fetch transcript'));
+                } catch (e) {
+                    reject(new Error('Failed to fetch transcript: ' + errorOutput));
+                }
+            }
+        });
+    });
+}
 const jsonToXml = (texts) => {
     let xml = '<?xml version="1.0" encoding="UTF-8"?>\n<captions>\n';
     texts.forEach((text, index) => {
